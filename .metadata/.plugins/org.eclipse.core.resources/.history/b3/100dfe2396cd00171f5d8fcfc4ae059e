@@ -1,0 +1,257 @@
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Scanner;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import java.io.*;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+public class GUI_Calendar_Model {
+
+	static  TreeMap<GregorianCalendar, TreeSet<Event>> eventsMap;
+	public static GregorianCalendar calendarN = new GregorianCalendar();
+	public static GregorianCalendar calendar = new GregorianCalendar();
+	String[] monthNames = {"January","February","March","April","May","June","July","August",
+			"September","October","November","December"};
+	String[] dayNames = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+	ArrayList<ChangeListener> changeListeners = new ArrayList<>();
+	int clickedDay, daysInMonth, yearN, monthN,month,year;
+    int currentYear, currentMonth, currentDay;
+	boolean monthChanged = false;
+
+	/**
+	 * Constructor for the GUI_Calendar_Model
+	 */
+	GUI_Calendar_Model(){
+		eventsMap = new TreeMap<>();
+		clickedDay=calendarN.get(Calendar.DAY_OF_MONTH);
+		daysInMonth=calendarN.getActualMaximum(Calendar.DAY_OF_MONTH);// getting the days in a month
+		yearN=calendarN.get(Calendar.YEAR);
+		monthN=calendarN.get(Calendar.MONTH);
+	//	load();
+	}
+	/**
+	 * Returns the daysInMonth->Maximum days in a Month
+	 * @return daysInMonth: The maximum number of days in a month
+	 */
+	public int getDaysInMonth(){
+		return daysInMonth;
+	}
+	
+	/**
+	 * Returns the daysInMonth->Maximum days in a Month for a specific calendar
+	 * @return daysInMonth: The maximum number of days in a month
+	 */
+	public int getDaysInMonthGC(GregorianCalendar calendar){
+		daysInMonth=calendar.getActualMaximum(Calendar.DAY_OF_MONTH); 
+		return daysInMonth;
+	}
+	/**
+	 * This function attaches a change listener to the changeListeners ArrayList
+	 * @param changeListener
+	 */
+	public void attach(ChangeListener changeListener)
+	{
+		changeListeners.add(changeListener);
+	}
+	/**
+	 * This function updates all change listeners in the ArrayList
+	 */
+	public void updateListeners(){
+		for(ChangeListener changeListener: changeListeners )
+		{changeListener.stateChanged(new ChangeEvent(this));}
+	}
+	/**
+	 * This function sets the clicked day 
+	 */
+	public void setClickedDay(int day)
+	{
+		clickedDay=day;
+	}
+	/**
+	 * This function returns the clicked day
+	 */
+	public int getClickedDay()
+	{
+		return clickedDay;
+	}
+	/**
+	 * This function returns the current year
+	 * @return yearN: current year
+	 */
+	public int getYearN()
+	{ 	
+		yearN=calendarN.get(Calendar.YEAR);
+		return yearN;
+	}
+	/**
+	 * This function returns the current month
+	 * @return monthN: current month
+	 */
+	public int getMonthN()
+	{ 	
+		monthN=calendarN.get(Calendar.MONTH);
+		return monthN;
+	}
+	/** This function returns the  year
+	 * @return year:   year
+	 */
+	public int getYear()
+	{ 	
+		year=calendar.get(Calendar.YEAR);
+		return year;
+	}
+	/**
+	 * This function returns the  month
+	 * @return month:  month
+	 */
+	public int getMonth()
+	{ 	
+		month=calendar.get(Calendar.MONTH);
+		return month;
+	}
+	/**
+	 * This function gets the numerical value of the day of the week
+	 */
+	public int getDayOfWeek(int dayOfMonth){
+		calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+		return calendar.get(Calendar.DAY_OF_WEEK);
+	}
+	
+	/**
+	 * This function gets the numerical value of the day of the week (current)
+	 */
+	public int getDayOfWeekN( ){
+		return calendarN.get(Calendar.DAY_OF_WEEK);
+	}
+	
+	/**
+	 * This function updates the value of the calendar and moves it to the following Month
+	 * @return nextMonth
+	 */  
+	public void nextMonth(GregorianCalendar calendar) {
+		calendar.add(Calendar.MONTH, 1);
+		daysInMonth=calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+		monthChanged=true;
+		updateCalendar();
+	}
+	/**
+	 * This function updates the value of the calendar and moves it to the previous Month
+	 * @return previousMonth
+	 */  
+	public void previousMonth(GregorianCalendar calendar) {
+		calendar.add(Calendar.MONTH, -1);
+		daysInMonth=calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+		monthChanged=true;
+		updateCalendar();
+	}	
+	
+	/**
+	 * This function returns a boolean value indicating whether or not the
+	 * month had been altered due to user interaction
+	 * @return monthChanged
+	 */
+	public boolean monthChanged(){
+		return monthChanged;
+	}
+	
+	/**
+	 * This function sets the monthChanged value to false
+	 * @return monthChanged
+	 */
+	public boolean monthChangedReset(){
+		return monthChanged=false;
+	}
+	
+	/**
+	 * This function moves the selected day forward with a value of 1
+	 *  
+	 */  
+	public void nextDay(GregorianCalendar calendar) { 
+		clickedDay++;
+		if(clickedDay>getDaysInMonthGC(calendar))
+		{	nextMonth(calendar);
+			clickedDay=1;
+		}
+		updateCalendar();
+//		calendar.add(Calendar.DAY_OF_WEEK, 1);
+//		String nextDay= printDay(calendar);
+	}
+	
+	/**
+	 * This function moves the selected day backward with a value of -1
+	 *  
+	 */  
+	public void previousDay(GregorianCalendar calendar) { 
+		clickedDay--;
+		if(clickedDay<getDaysInMonthGC(calendar))
+		{	nextMonth(calendar);
+			clickedDay=getDaysInMonthGC(calendar); // the selected day is the last day of the previous month
+		}
+		updateCalendar();
+//		calendar.add(Calendar.DAY_OF_WEEK, 1);
+//		String nextDay= printDay(calendar);
+	}
+	
+	public int getStartOfMonth(GregorianCalendar calendar){
+		return calendar.get(GregorianCalendar.DAY_OF_WEEK);
+	}
+	// create event
+	// check if there are events on the specified day
+	// check if there is conflict
+	// get events on a particular date
+	// save events
+	// load events
+	// comparator
+	
+	
+	
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// 
+//	/**
+//	 * Prints the Day Display (TODAY)
+//	 * 
+//	 */      
+//	public String printDay(GregorianCalendar calendar){
+//		String today  = dayNames[calendar.get(Calendar.DAY_OF_WEEK)-1];
+//		String monthShort  = monthNames[calendar.get(Calendar.MONTH)];
+//		int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+//		int year = calendar.get(Calendar.YEAR);
+//
+//		System.out.println(today+", "+monthShort+" "+ dayOfMonth+", "+year);
+//
+//		String calendarString = gcToString(calendar);
+//		getEventsOnThisDay(calendarString);
+//		
+//		String x="";
+//		return x;    	
+//	}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+	
+	public void setCurrentYear(int y){this.currentYear=y;}
+	public void setCurrentDay(int d){this.currentDay=d;}
+	public void setCurrentMonth(int m){this.currentMonth=m;}
+	public int getCurrentYear(){return currentYear;}
+	public int getCurrentDay(){return currentDay;}
+	public int getCurrentMonth(){return currentMonth;}
+	
+	
+	// For EVENTS 
+	public void loadEvents(){}
+
+	public void updateCalendar(){}
+	
+	private static class Event  {
+		// constructor
+		// take the string of events
+	}
+}

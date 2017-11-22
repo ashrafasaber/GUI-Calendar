@@ -1,0 +1,25 @@
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class MyLabel extends JFrame {
+	
+	JPanel myPanel = new JPanel();
+	JLabel myLabel = new JLabel();
+	String path="";
+	public MyLabel(String path,int length,int width)
+	{
+		this.path=path;
+		setTitle("Tutorial");
+		setVisible(true);
+		setSize(700,700);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		myLabel.setIcon(new ImageIcon(path));
+		myLabel.add(myLabel);
+		add(myPanel);
+		validate();
+	}
+	
+ 
+}

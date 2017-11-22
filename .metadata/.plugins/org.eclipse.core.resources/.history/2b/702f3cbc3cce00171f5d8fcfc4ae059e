@@ -1,0 +1,583 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
+/**
+ * View for the Calendar
+ * @author Ashraf
+ */
+public class GUI_Calendar_View extends JPanel implements ChangeListener{
+
+	String[] monthNames = {"January","February","March","April","May","June","July","August",
+			"September","October","November","December"};
+	String[] dayNames = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+	String[] calendarHeader={"Su","Mo","Tu","We","Th","Fr","Sa"};
+	String[] timeSlotsArray;
+	private Map<Integer, ArrayList<String>> schedule;
+	private Map<Integer, String[]> timeSlotsMap;
+	ImageIcon today,prevDay,nextDay,quit,create;
+	private GUI_Calendar_Model model;
+	private JLabel dayLabel,monthLabel;
+	private JTable calDaysTable;
+	private DefaultTableModel calTableModel;
+	private JTable calEventsTable;
+	private DefaultTableModel calEventsTableModel;
+	
+	private int currentDay;
+	private JButton button1,button2,button3,button4,button5,button6;
+	private JPanel panel1,panel2,panel3,panel4,panel5,panel6,panel7,panel8,panel9,panel10,top,top_UI,left,left_UI,center_Right;
+	private JTextPane dayText = new JTextPane();
+	private JFrame myFrame;
+	String month="";
+	JTextArea myTextArea  ;
+	
+	/**
+	 * GUI_Calendar_View Constructor
+	 * @param model
+	 */
+	public GUI_Calendar_View(GUI_Calendar_Model model)
+	{
+		this.model=model;
+		currentDay=model.getCurrentDay();
+		//Creating Labels and Tables
+		dayLabel=new JLabel("");
+ 		monthLabel=new JLabel();
+		calTableModel = new DefaultTableModel()
+		{
+			public boolean isCellEditable(int rowIndex, int columnIndex)
+			{
+				return false;
+			}
+		};
+ 		// Calendar Table
+		calDaysTable=new JTable(calTableModel);
+		for(String day : calendarHeader)
+		{calTableModel.addColumn(day);
+		}
+		calTableModel.setColumnCount(7); // 7 Days
+		calTableModel.setRowCount(7);
+		calDaysTable.setRowHeight(30);
+		// Setting Column Width
+		TableColumnModel columnModel = calDaysTable.getColumnModel();
+
+		for(int i =0;i< calDaysTable.getColumnCount();i++)
+		{columnModel.getColumn(i).setPreferredWidth(25);}
+
+		calDaysTable.setColumnSelectionAllowed(true);
+		calDaysTable.setRowSelectionAllowed(true);
+		calDaysTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);   
+
+		// Events Table	
+		calEventsTableModel = new DefaultTableModel()
+		{
+			public boolean isCellEditable(int rowIndex, int columnIndex)
+			{
+				return false;
+			}
+		};
+		calEventsTable=new JTable(calEventsTableModel);
+		calEventsTableModel.addColumn("Time");
+		calEventsTableModel.addColumn("Event");
+		
+		calEventsTableModel.setColumnCount(2);
+		calEventsTableModel.setRowCount(26);
+		calDaysTable.setRowHeight(35);
+		
+		TableColumnModel columnModel2 = calEventsTable.getColumnModel();
+		columnModel2.getColumn(0).setPreferredWidth(50);
+		columnModel2.getColumn(1).setPreferredWidth(500);
+		calEventsTable.setColumnSelectionAllowed(true);
+		calEventsTable.setRowSelectionAllowed(true);
+		calEventsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);   
+		dayViewTableText();
+		//  
+		updateCalendar(model);
+
+		//Drawing image icons
+	//	today = new ImageIcon("Today1.png");
+		prevDay = new ImageIcon("prevButton1.png");		
+		nextDay = new ImageIcon("nextButton1.png");
+		quit = new ImageIcon("quitButton.png");		
+		create = new ImageIcon("CreateButton1.png");
+
+		//Creating buttons
+	//	button1 = new JButton(today);
+		button2 = new JButton(prevDay);
+		button3 = new JButton(nextDay);
+		button4 = new JButton(quit);
+		button5 = new JButton(create);	
+
+		//model.load(); 
+		
+		/**
+		 * Create Button Action Listener
+		 */
+		// Create
+		button5.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				promptInputBox();
+				updateCalendar(model);
+				dayViewTableEventUpdate(model);
+			}
+		});
+		// NextDay
+		button3.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.nextDay( );
+				updateCalendar(model);
+				dayViewTableEventUpdate(model);
+				monthLabel.setText(model.getDD()); 
+		 	 	
+			}
+		});
+		// PreviousDay
+		button2.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.previousDay( );
+
+				updateCalendar(model);
+				dayViewTableEventUpdate(model);
+				monthLabel.setText(model.getDD());
+			}
+		});
+
+		// Quit
+		button4.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.quit();
+			}
+		});
+
+	
+		//Creating panels
+		panel1 = new JPanel();  
+		panel2 = new JPanel();
+		panel3 = new JPanel();
+		panel4 = new JPanel();
+
+		panel5 = new JPanel();  // create
+		panel6 = new JPanel(); // month
+		panel7 = new JPanel();  // calendar table
+		panel8 = new JPanel(); 
+		panel9 = new JPanel(); 
+		panel10 = new JPanel(); 
+		top = new JPanel();
+		top_UI = new JPanel();
+		left = new JPanel();
+		left_UI = new JPanel();
+		center_Right = new JPanel();
+		//Adding buttons to the panels
+		
+		//Top Panel
+	//	panel1.add(button1);
+		panel2.add(button2);
+		panel3.add(button3);
+		panel4.add(button4);
+		//Adding selected panels to the top panel
+		top.add(panel2);
+		top.add(panel3);
+		//top.add(panel1);
+		top.add(panel4);
+		top_UI.add(top,BorderLayout.NORTH); 
+		//Left Panel
+		// Create Button
+		panel5.add(button5 ); // create
+		panel5.setBackground(Color.BLACK);
+		panel5.setMaximumSize(new Dimension(150,45));
+		// Month Label
+		panel6.add(monthLabel);  
+		panel6.setMaximumSize(new Dimension(150,20));
+
+		// Calendar Table
+		panel7.add(calDaysTable,BorderLayout.SOUTH );
+
+		// Using BoxLayout with Y_AXIS in order to arrange items in vertical order
+		left_UI = new JPanel();
+		left_UI.setLayout(new BoxLayout(left_UI, BoxLayout.Y_AXIS));
+		left_UI.add(panel5);
+		left_UI.add(panel6);	
+		left_UI.add(panel7);	
+
+		JPanel  DayView= new JPanel();
+		DayView.setLayout(new BoxLayout(DayView, BoxLayout.Y_AXIS));
+		DayView.add(dayLabel);
+		DayView.add(calEventsTable);
+		DayView.setMaximumSize(new Dimension(650,650));
+		JPanel  finalV= new JPanel();
+		finalV.setLayout(new BoxLayout(finalV, BoxLayout.X_AXIS));
+		finalV.add(left_UI);
+		finalV.add(DayView);	
+		//Setting panel background colors
+		dayLabel.setBackground(Color.WHITE);
+		top.setBackground(Color.WHITE); 
+		top_UI.setBackground(Color.WHITE);
+		panel1.setBackground(Color.WHITE);
+		panel2.setBackground(Color.WHITE);
+		panel3.setBackground(Color.WHITE);
+		panel4.setBackground(Color.WHITE);
+		panel5.setBackground(Color.WHITE);
+		panel6.setBackground(Color.WHITE);
+		left_UI.setBackground(Color.WHITE);
+		//Adjusting myFrame attributes
+		myFrame = new JFrame();
+		myFrame.setBackground(Color.WHITE);
+		myFrame.setTitle("GUI Calendar");
+		myFrame.setSize(1000,1000);
+		myFrame.setVisible(true);
+		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		myFrame.add(top_UI, BorderLayout.NORTH);
+		myFrame.add(finalV);
+		myFrame.pack();
+
+		model.createEvent("Birthday","11/21/2017","10:00","11:00");
+		model.createEvent("Cinema","11/21/2017","11:00","12:00");		 
+		dayViewTableEventUpdate(model);
+		
+		/**
+		 *  Create Mouse Listener for the Calendar Table
+		 */
+		calDaysTable.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				JTable table=(JTable)e.getSource();
+				int rowVal=table.getSelectedRow();
+				int columnVal=table.getSelectedColumn();
+				Object data= calTableModel.getValueAt(rowVal, columnVal);
+				if(data!=null)
+				{
+					Integer temp = data.hashCode();
+					int maxDaysInMonth = model.getDaysInMonthGC(model.calendar);
+					if(temp<=maxDaysInMonth && temp>=1)
+					{
+						model.setCurrentDay(temp);
+						updateCalendar(model);
+					}	
+				}
+			}
+		});
+	}
+
+	public void dayViewPaneLabel(){
+		int yearValue= model.calendar.get(Calendar.YEAR); 
+		int monthIndex= model.calendar.get(Calendar.MONTH)+1;
+		int dayValue = model.calendar.get(Calendar.DAY_OF_WEEK);
+		int dayValue2 = model.calendar.get(Calendar.DAY_OF_MONTH);
+		timeSlotsArray= new String[50];
+		dayLabel.setText(dayNames[dayValue-1]+" "+monthIndex+"/"+dayValue2+"/"+yearValue);
+	}
+
+	
+	// returns date of day label in string format
+	public String dayLabelToString( ){
+	// day label split after white space
+	String dayLabelString=  dayLabel.getText();
+	String[] splitted  ;
+	splitted = dayLabelString.split("\\s+");
+	String dayDate= splitted[1];
+	return dayDate;
+	}
+ 
+	// gets start hour
+	public int timeToInt(Event e)
+	{
+		String startTime = e.getStartTime();
+		String delims = "[:]";
+		String[] start=startTime.split(delims);
+		int startHr= Integer.parseInt(start[0]);
+		return startHr;
+		// http://pages.cs.wisc.edu/~hasti/cs302/examples/Parsing/parseString.html
+	}
+	
+	public void dayViewTableEventUpdate(GUI_Calendar_Model model )
+	{
+		// 	static  TreeMap<GregorianCalendar, TreeSet<Event>> eventsMap;
+		String dayDate = dayLabelToString( );
+		String gcString="";
+		String[] eventsOnDay= new String[25];
+		// now I need gc to string for day
+		for( GregorianCalendar g : model.eventsMap.keySet())
+		{
+			gcString=gcToString(g);
+			if(dayDate.equals(gcString))
+			{
+				for(Event e: model.eventsMap.get(g))
+				{
+					int index= timeToInt(e);
+					eventsOnDay[index]= e.getTitle();
+				}
+				for(int i=0;i<eventsOnDay.length;i++){
+					String s= eventsOnDay[i];
+					calEventsTableModel.setValueAt(s, i+1, 1);
+				}
+			} else for(int x=1;x<=24;x++)
+			{
+				calEventsTableModel.setValueAt(" ", x, 1);
+			}
+		}
+	}
+	
+	public void dayViewTableText(){
+		calEventsTableModel.setValueAt("Time", 0, 0);
+		calEventsTableModel.setValueAt("Event", 0, 1);
+		calEventsTableModel.setValueAt(" 0  : ", 1, 0);
+		calEventsTableModel.setValueAt(" 1  : ", 2, 0);
+		calEventsTableModel.setValueAt(" 2  : ", 3, 0);
+		calEventsTableModel.setValueAt(" 3  : ", 4, 0);
+		calEventsTableModel.setValueAt(" 4  : ", 5, 0);
+		calEventsTableModel.setValueAt(" 5  : ", 6, 0);
+		calEventsTableModel.setValueAt(" 6  : ", 7, 0);
+		calEventsTableModel.setValueAt(" 7  : ", 8, 0);
+		calEventsTableModel.setValueAt(" 8  : ", 9, 0);
+		calEventsTableModel.setValueAt(" 9  : ", 10, 0);
+		calEventsTableModel.setValueAt("10  : ", 11, 0);
+		calEventsTableModel.setValueAt("11  : ", 12, 0);
+		calEventsTableModel.setValueAt("12  : ", 13, 0);
+		calEventsTableModel.setValueAt("13  : ", 14, 0);
+		calEventsTableModel.setValueAt("14  : ", 15, 0);
+		calEventsTableModel.setValueAt("15  : ", 16, 0);
+		calEventsTableModel.setValueAt("16  : ", 17, 0);
+		calEventsTableModel.setValueAt("17  : ", 18, 0);
+		calEventsTableModel.setValueAt("18  : ", 19, 0);
+		calEventsTableModel.setValueAt("19  : ", 20, 0);
+		calEventsTableModel.setValueAt("20  : ", 21, 0);
+		calEventsTableModel.setValueAt("21  : ", 22, 0);
+		calEventsTableModel.setValueAt("22  : ", 23, 0);
+		calEventsTableModel.setValueAt("23  : ", 24, 0);
+	}
+ 
+	public void updateCalendar(GUI_Calendar_Model model){
+		dayViewPaneLabel();
+		int monthIndex= model.calendar.get(Calendar.MONTH); // retrieves the index of the month from 0-11
+		int yearValue= model.calendar.get(Calendar.YEAR);   // retrieves the year value from the calendar parameter
+
+		GregorianCalendar  calMonthStart = new GregorianCalendar(yearValue, monthIndex, 1); 
+		int dayIndex = calMonthStart.get(Calendar.DAY_OF_WEEK)-1; // 1st day of month index
+
+		int maxDaysInMonth=model.getDaysInMonth();
+		int startOfMonth=model.getStartOfMonth(model.calendar);
+
+		//monthLabel=new JLabel(monthNames[monthIndex]+" "+yearValue);
+		monthLabel.setText(model.getDD());
+		//	int currentDay=model.calendar.get(GregorianCalendar.DAY_OF_MONTH);
+
+		for(int row=0;row<1;row++)
+		{
+			for(int col=0;col<7;col++)
+			{
+				calTableModel.setValueAt(calendarHeader[col], row, col);
+			}
+		}
+		for( int j=0; j<dayIndex;j++)  // j< first day of week
+		{
+			calTableModel.setValueAt(" ", 1, j);
+		}
+
+		for(int i=1;i<=maxDaysInMonth;i++)
+		{
+			int row = ((i + dayIndex - 1) / 7)+1;
+			int column  =  (i + dayIndex - 1) % 7;
+			calTableModel.setValueAt(i, row, column);            
+		}
+
+		//	calDaysTable.setDefaultRenderer(calDaysTable.getColumnClass(1), new tableRenderer());
+	}
+
+	//public void viewDayPanel(GUI_Calendar_Model model){}
+
+//	public class tableRenderer extends DefaultTableCellRenderer
+//	{
+//		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//			setBackground(Color.WHITE); 
+//			if (value != null){
+//				if (Integer.parseInt(value.toString()) == currentDay){ //Today
+//					setBackground(Color.green);
+//				}
+//			}
+//			setForeground(Color.black);
+//			return this;
+//		}
+//	}
+	
+	/**
+	 * Function to convert a String to a GregorianCalendar object
+	 * @param string
+	 * @return c
+	 */
+	public GregorianCalendar stringToGC(String string){
+		
+		Date dummyDate = null;
+		GregorianCalendar c = new GregorianCalendar();
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+		try{
+			dummyDate = dateFormatter.parse(string);
+			c.setTime(dummyDate);
+		}
+		catch(ParseException e) {
+			System.out.println(e.getMessage());
+		}
+		return c;
+	}
+	
+	/**
+	 * Manages new event creation
+	 */
+	private void promptInputBox()
+	{
+		//Input Text Fields
+		JTextField inputTitle = new JTextField(40);
+		JTextField inputDate = new JTextField(10);
+		JTextField inputStartTime = new JTextField(10);
+		JTextField inputFinishTime = new JTextField(10);
+
+		//create 3 panels 
+		JPanel inputPanel = new JPanel();
+		JPanel titlePanel = new JPanel();
+		JPanel detailsPanel = new JPanel();
+		inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+
+		//add title-related components
+		titlePanel.add(new JLabel("Title"));
+		titlePanel.add(inputTitle);
+
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/d/yyyy");
+		
+		
+		String text=(model.calendar.get(Calendar.MONTH)+1)+"/"+model.getClickedDay()+"/"+model.calendar.get(Calendar.YEAR) ;
+		inputDate.setText(text);
+
+		detailsPanel.add(new JLabel("Date"));
+		detailsPanel.add(inputDate);
+
+		detailsPanel.add(new JLabel("from"));
+		detailsPanel.add(inputStartTime);
+	
+		detailsPanel.add(new JLabel("to"));
+		detailsPanel.add(inputFinishTime);
+
+		
+		inputPanel.add(titlePanel);
+		inputPanel.add(detailsPanel);
+		inputPanel.add(new JLabel("MM/DD/YYYY                 00:00                    24:00"));
+
+		 
+		showDialogue(inputPanel, inputTitle, inputDate, inputStartTime, inputFinishTime);
+
+	}
+
+	/**
+	 * This function prompts a dialogue box that asks for input for event creation
+	 */
+	private void showDialogue(JPanel inputPanel, JTextField title, JTextField date, JTextField start,
+			JTextField finish)
+	{
+		int result = JOptionPane.showConfirmDialog(null, inputPanel,
+				"Event Information", JOptionPane.DEFAULT_OPTION);
+		//when the "Ok" button is clicked
+		if (result == JOptionPane.OK_OPTION) 
+		{ 
+
+			model.createEvent(title.getText(),date.getText(),start.getText(),finish.getText());
+			
+			
+//				//recursive call to show the event details dialogue
+//			showDialogue(inputPanel, title, date, start, finish);
+//			}
+//			 
+//			
+			//check if there's a time conflict 
+//			boolean isConflicting = scheduler.checkForTimeConflict(event);
+//
+//			//if there is indeed a time conflict
+//			if (isConflicting)
+//			{
+//				//the calendar generates an error message, asking the user
+//				//to enter an event without any time conflict. 
+//				JOptionPane.showMessageDialog(null, 
+//						"This event conflicts with an existing event! \n"
+//								+ "Please enter the event again with a correct time.",
+//								"Time Conflict", JOptionPane.ERROR_MESSAGE);
+//				//recursive call to show the event details dialogue
+//				showDialogue(inputPanel, title, date, start, finish);
+//			}
+//			else
+//				//schedule event 
+//				scheduler.createEvent(event);
+ 		}
+		//if the close ("x") button is clicked, do nothing
+		else if (result == JOptionPane.CLOSED_OPTION)
+		{}
+	}
+	/**
+	 * Function to convert a GregorianCalendar to a String object
+	 * @param calendar
+	 * @return x
+	 */
+	public String gcToString(GregorianCalendar calendar){
+		
+		String dayS;
+		int dayI=calendar.get(Calendar.DAY_OF_MONTH);
+		if(dayI<10){dayS="0"+dayI;}
+		else{dayS=String.valueOf(dayI);}
+
+		String monthS;
+		int monthI=calendar.get(Calendar.MONTH)+1;
+		if(monthI<10){monthS="0"+monthI;}
+		else{monthS=String.valueOf(monthI);}		
+		
+		String yearS;
+		int yearI=calendar.get(Calendar.YEAR);
+		yearS=String.valueOf(yearI);
+		
+		  String x=monthS+"/"+dayS+"/"+yearS;
+		  return x;
+	}
+	
+
+	
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		// TODO Auto-generated method stub
+	}
+}
+
+// http://www.dreamincode.net/forums/topic/207123-change-the-shape-of-jbutton/

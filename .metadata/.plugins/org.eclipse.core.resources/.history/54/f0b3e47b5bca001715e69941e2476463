@@ -1,0 +1,10 @@
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class myLabelButton extends JFrame{
+	JPanel jpanel = new JPanel();
+	JLabel jlabel = new JLabel();
+	
+	
+}

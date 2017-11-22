@@ -1,0 +1,18 @@
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class myLabelButton extends JPanel{
+	JLabel nextLabel, previousLabel, todayLabel, createLabel,quitLabel;
+	ImageIcon imageNext = setImage("nextButton1.png");
+	ImageIcon imagePrevious = setImage("prevButton1.png");
+	ImageIcon imageToday = setImage("Today1.png");
+	ImageIcon imageQuit = setImage("quitButton.png");
+	ImageIcon imageCreate = setImage("CreateButton1.png");
+
+	public ImageIcon setImage(String path){
+		ImageIcon imageIcon = new ImageIcon(path);
+		return imageIcon;
+	}
+}

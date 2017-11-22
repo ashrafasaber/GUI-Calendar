@@ -1,0 +1,6 @@
+import javax.swing.JButton;
+
+public class Button extends JButton {
+	public paintBorder() {}
+	overload paintComponent() to only draw the Image 
+}

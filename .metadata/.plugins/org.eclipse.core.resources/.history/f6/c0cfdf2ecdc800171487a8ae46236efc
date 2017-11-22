@@ -1,0 +1,22 @@
+import java.awt.Image;
+import java.awt.Shape;
+
+/**
+ * This Class is the ConcreteStrategy in the Strategy Pattern
+ * @author Ashraf
+ */
+public class AncientEgyptianLayout implements BoardLayout {
+
+	@Override
+	public Image boardViewImage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Shape boardShape(BoardShape boardShape) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

@@ -1,0 +1,41 @@
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class myLabelButton extends JPanel{
+
+	public myLabelButton()
+	{
+		JLabel nextLabel, previousLabel, todayLabel, createLabel,quitLabel;
+		ImageIcon imageNext = setImage("nextButton1.png");
+		ImageIcon imagePrevious = setImage("prevButton1.png");
+		ImageIcon imageToday = setImage("Today1.png");
+		ImageIcon imageQuit = setImage("quitButton.png");
+		ImageIcon imageCreate = setImage("CreateButton1.png");
+
+		nextLabel = new JLabel();
+		nextLabel.setIcon(imageNext);
+		previousLabel=new JLabel();
+		previousLabel.setIcon(imagePrevious);
+		todayLabel = new JLabel();
+		todayLabel.setIcon(imageToday);
+		createLabel = new JLabel();
+		createLabel.setIcon(imageCreate);
+		quitLabel = new JLabel();
+		quitLabel.setIcon(imageQuit);
+
+		nextLabel.setToolTipText("Next Day");
+		previousLabel.setToolTipText("Previous Day");
+		todayLabel.setToolTipText("Go to Today");
+		createLabel.setToolTipText("Create an Event");
+		quitLabel.setToolTipText("Quit Program");
+	}
+
+	public ImageIcon setImage(String path){
+		ImageIcon imageIcon = new ImageIcon(path);
+		return imageIcon;
+	}
+}
+
+// https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/components/LabelDemoProject/src/components/LabelDemo.java

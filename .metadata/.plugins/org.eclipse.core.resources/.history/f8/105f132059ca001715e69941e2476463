@@ -1,0 +1,39 @@
+import java.awt.Graphics;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+public class MyButton extends JButton {
+//	
+//	MyButton(String myButtonName){
+//		super(myButtonName);
+//	}
+	
+	public void paintBorder(Graphics g){}
+	
+	/*
+	 *  protected void paintBorder(Graphics g) 
+	 *  {
+	        if (isBorderPainted()) {
+	            super.paintBorder(g);
+	        }
+    	} 
+	 */
+	
+	public void paintComponent(Graphics g){
+		super.paintComponent(g); //
+		ImageIcon imageIcon = new ImageIcon("Today1.png");
+		imageIcon.paintIcon(this, g, 100,100);
+	}
+	
+	public static void main(String[] args){
+		MyButton myButton = new MyButton();
+		JFrame myFrame = new JFrame();
+		myFrame.setTitle("Simple Calendar");
+		myFrame.setSize(1000,1000);
+		myFrame.setVisible(true);
+		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		myFrame.add(myButton);
+	}
+}

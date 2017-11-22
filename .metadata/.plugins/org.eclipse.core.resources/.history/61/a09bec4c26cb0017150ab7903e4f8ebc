@@ -1,0 +1,21 @@
+import java.awt.Graphics;
+
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
+public class MyPanel extends JPanel {
+	String path="" ;
+	int x=0,y=0;
+	public MyPanel(String path,int x,int y)
+	{
+		this.path =path;
+		this.x=x;
+		this.y=y;
+	}
+	public void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+		ImageIcon i = new ImageIcon(path);
+		i.paintIcon(this, g, x, y);
+	}
+}
